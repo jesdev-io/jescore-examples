@@ -29,7 +29,7 @@ int main(void){
 
     jes_init();
     jes_register_and_launch_job("blink", 256, 1, blink, 1);
-    jes_register_and_launch_job("hello", 256, 1, hello, 0);
+    jes_register_job("hello", 256, 1, hello, 0);
     jes_dispatch();
 }
 
