@@ -143,7 +143,7 @@ void port_setup(){
 }
 
 void port_loop(){
-
+    // this function is never reached.
 }
 
 void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef* hsai){
