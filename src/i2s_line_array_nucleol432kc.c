@@ -1,7 +1,7 @@
 #include <jescore.h>
 #include "port.h"
-#include "stm32l4xx_hal.h"
 #include "fastmath.h"
+#include "utils.h"
 
 #define BLOCK_SIZE 512
 #define UINT32_TO_FLOAT32(x) ((((int32_t)x) << 8) / 256) / 8388608.0f
@@ -21,8 +21,6 @@ typedef struct stereo_val_t{
 }stereo_val_t;
 
 stereo_t mem[BLOCK_SIZE];
-
-void formatFloat(float value, int decimal_places, char *out_str);
 
 #define LED_PORT GPIOB
 #define LED_GPIO GPIO_PIN_3
@@ -126,36 +124,4 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef* hsai){
 
 void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef* hsai){
     jes_notify_job_ISR("_audio", &mem[BLOCK_SIZE/2]);
-}
-
-void formatFloat(float value, int decimal_places, char *out_str)
-{
-    int int_part = (int)value;          // Extract integer part
-    float frac_part = value - int_part; // Extract fractional part
-
-    // Handle negative sign if needed
-    if (int_part < 0)
-    {
-        int_part = -int_part;
-        *out_str++ = '-';
-    }
-
-    // Convert integer part to string
-    int int_digits = sprintf(out_str, "%d", int_part);
-    out_str += int_digits;
-
-    // Add decimal point if necessary
-    if (decimal_places > 0)
-    {
-        *out_str++ = '.';
-
-        // Ensure the fractional part is positive before converting
-        frac_part = fabs(frac_part);
-
-        // Multiply fractional part to get desired precision
-        frac_part *= pow(10, decimal_places);
-
-        // Convert fractional part (now an integer) to string
-        sprintf(out_str, "%d", (int)frac_part);
-    }
 }
