@@ -1,3 +1,32 @@
+/*
+This project was generated with the cube2pio tool: 
+
+*** https://github.com/jesdev-io/cube2pio ***
+
+Hardware access is performed with the STM32Cube HAL and 
+can be found in `lib/port_stereo_spl_meter_stm32`. There, 
+see `port.c` for the STM32Cube HAL specific driver calls.
+The HAL redirects to `HAL_SAI_RxHalfCpltCallback()` and
+`HAL_SAI_RxCpltCallback()`, which are defined in this file
+and used for audio retrieval. 
+
+CLI (Python):
+- Call `jescore audio spl` to get the current stereo SPL (Z)
+- Call `watch -n 1 jescore audio spl` to see the SPL meter
+  Update with 1 Hz.
+
+CLI (Serial connection):
+- Call `jescore audio spl` to get the current stereo SPL (Z)
+
+MICROPHONES:
+- 2x INMP441 Breakout Boards
+
+PINDEFS (set in `port.c`):
+- `BCLK`: PA8
+- `LRCLK`: PA9
+- `SD`: PA10
+*/
+
 #include <jescore.h>
 #include "port.h"
 #include "fastmath.h"
@@ -6,7 +35,7 @@
 #define NUM_CHANNELS 2
 #define BLOCK_SIZE 512
 #define UINT32_TO_FLOAT32(x) ((((int32_t)x) << 8) / 256) / 8388608.0f
-#define MIC_SENS_DB -26         // data sheet
+#define MIC_SENS_DB -26         // data sheet (adjust if needed)
 #define MIC_CALIB_POINT_DB 94   // typical
 #define ROLLING_WINDOW_SIZE 100 // roughly 1 second
 
