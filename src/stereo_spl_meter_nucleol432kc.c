@@ -55,8 +55,6 @@ typedef union {
 
 stereo_t mem[BLOCK_SIZE];
 
-void formatFloat(float value, int decimal_places, char *out_str);
-
 #define LED_PORT GPIOB
 #define LED_GPIO GPIO_PIN_3
 #define LED_ENABLE_PORT() __HAL_RCC_GPIOB_CLK_ENABLE()
