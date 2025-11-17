@@ -1,0 +1,40 @@
+name: PlatformIO CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        include:
+          # ESP32 Arduino
+          - example: src/hello_world_arduino.cpp
+            env: esp32-arduino
+          - example: src/fsm_cli_arduino.cpp  
+            env: esp32-arduino
+          - example: src/sync_async_arduino
+            env: esp32-arduino
+          # STM32 STM32Cube
+          - example: src/hello_world_nucleol432kc.c
+            env: nucleol432kc-cube
+          - example: src/stereo_spl_meter_nucleol432kc.c
+            env: nucleol432kc-cube
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build program for supported boards
+        run: pio run -e ${{ matrix.env }}
