@@ -29,6 +29,7 @@ PINDEFS (set in `port.c`):
 
 #include <jescore.h>
 #include "port.h"
+#include "utils.h"
 #include "fastmath.h"
 #include <math.h>
 
@@ -182,23 +183,3 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef* hsai){
 void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef* hsai){
     jes_notify_job_ISR("_audio", &mem[BLOCK_SIZE/2]);
 }
-
-void formatFloat(float value, int decimal_places, char *out_str){
-    int int_part = (int)value;
-    float frac_part = value - int_part;
-    if (value < 0) {
-        *out_str++ = '-';
-        int_part = -int_part;
-        frac_part = -frac_part;
-    }
-    int int_digits = sprintf(out_str, "%d", int_part);
-    out_str += int_digits;
-
-    if (decimal_places > 0) {
-        *out_str++ = '.';
-        frac_part *= powf(10, decimal_places);
-        int frac_int = (int)(frac_part + 0.5f);
-        sprintf(out_str, "%0*d", decimal_places, frac_int);
-    }
-}
-
