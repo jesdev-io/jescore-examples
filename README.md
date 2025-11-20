@@ -1,7 +1,7 @@
 # `jescore` Examples
 |Main Repo 🔆|`main` CI 📦️|`dev` CI 🚢|Support 🙏|
 |-|-|-|-|
-|[<img src="https://github.com/user-attachments/assets/2fc4f696-0a6c-444b-a99b-053f9bee6d59" width="100"/>](https://github.com/user/repository/subscription)|[![Main](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml)|[![Dev](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml)|[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack)|
+|[<img src="https://github.com/user-attachments/assets/2fc4f696-0a6c-444b-a99b-053f9bee6d59" width="100"/>](https://github.com/jesdev-io/jescore)|[![Main](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml)|[![Dev](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jesdev-io/jescore-examples/actions/workflows/workflow.yml)|[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack)|
 
 **This repo presents various applications utilizing `jescore`.**
 
