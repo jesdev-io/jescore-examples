@@ -15,3 +15,12 @@ If examples require more low level driver code, for example due to the inclusion
 
 ## Additional Notes
 - The `port_*` prefix under `lib/` comes from porting STM32CubeIDE projects to PlatformIO with [`cube2pio`](https://github.com/jesdev-io/cube2pio)
+
+## List of Examples
+|Example|Requires|Platform|
+|-|-|-|
+|👋 `hello_world_arduino`||ESP32 + Arduino|
+|👋 `hello_world_nucleol432kc`||STM32 NUCLEOL432KC|
+|🧮 `fsm_cli_arduino`||ESP32 + Arduino|
+|⏳️ `sync_async_arduino`||ESP32 + Arduino|
+|🎤 `stereo_spl_meter_nucleol432kc`|[I²S](lib/port_stereo_spl_meter_nucleol432kc/)|STM32 NUCLEOL432KC|
