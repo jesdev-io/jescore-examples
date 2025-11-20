@@ -1,7 +1,11 @@
 # `jescore` Examples
 
 [Check out `jescore`](https://github.com/jesdev-io/jescore)!
- | [![Main](https://github.com/jake-is-ESD-protected/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jake-is-ESD-protected/jescore-examples/actions/workflows/workflow.yml)
+ | 
+ 
+ [![Main](https://github.com/jake-is-ESD-protected/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jake-is-ESD-protected/jescore-examples/actions/workflows/workflow.yml)
+
+ 
  | [![Dev](https://github.com/jake-is-ESD-protected/jescore-examples/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jake-is-ESD-protected/jescore-examples/actions/workflows/workflow.yml)
 
 This repo presents various applications utilizing `jescore`. 
