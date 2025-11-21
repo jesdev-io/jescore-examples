@@ -16,7 +16,7 @@ CLI (Python):
   Update with 1 Hz.
 
 CLI (Serial connection):
-- Call `jescore audio spl` to get the current stereo SPL (Z)
+- Call `audio spl` to get the current stereo SPL (Z)
 
 MICROPHONES:
 - 2x INMP441 Breakout Boards
