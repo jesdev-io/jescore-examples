@@ -22,8 +22,8 @@ void hello(void* p){
 void setup(){
     pinMode(LED_PIN, OUTPUT);
     jes_init();
-    jes_register_and_launch_job("blink", 1024, 1, blink, 1);
-    jes_register_job("hello", 1024, 1, hello, 0);
+    jes_register_and_launch_job("blink", 1024, 1, blink, 1, 0);
+    jes_register_job("hello", 1024, 1, hello, 0, 0);
 }
 
 void loop(){

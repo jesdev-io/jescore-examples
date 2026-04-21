@@ -159,8 +159,8 @@ void audio_controller(void* p) {
 /// @param p `jescore` job pointer.
 void port_setup(){
     jes_init();
-    jes_register_and_launch_job("_audio", 2048, 1, audio_loop, 1);
-    jes_register_job("audio", 1024, 1, audio_controller, 0);
+    jes_register_and_launch_job("_audio", 2048, 1, audio_loop, 1, 1);
+    jes_register_job("audio", 1024, 1, audio_controller, 0, 1);
     LED_ENABLE_PORT();
     HAL_StatusTypeDef stat;
     if ((stat = HAL_SAI_Receive_DMA(&hsai_BlockA1, (uint8_t*)mem, BLOCK_SIZE*2)) != HAL_OK){
