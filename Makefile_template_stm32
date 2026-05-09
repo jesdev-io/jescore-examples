@@ -1,0 +1,335 @@
+# =========================================================
+# Generic STM32 + FreeRTOS + jescore firmware Makefile
+# =========================================================
+# This Makefile is intentionally board-agnostic. Edit the USER CONFIG block
+# for your STM32 family/part, HAL/CMSIS layout, startup file, linker script,
+# and application sources.
+
+# =========================================================
+# USER CONFIG (EDIT THIS BLOCK)
+# =========================================================
+
+TARGET := user_app
+
+# Your project sources
+SRC_DIR := src
+C_SOURCES := $(SRC_DIR)/hello_world_stm32h750.c
+CPP_SOURCES :=
+ASM_SOURCES :=
+C_INCLUDES :=
+
+# jescore repo location (contains FreeRTOS-Kernel as submodule)
+JESCORE_DIR := ../jescore
+
+# Your project macros 
+C_DEFS := \
+	-DSTM32H7
+
+# STM32 family/part selection. Adjust these for your target.
+STM32_FW_DIR := ../STM32CubeH7
+STM32_FAMILY := STM32H7xx
+STM32_HAL_PREFIX := stm32h7xx
+STM32_PART := STM32H750xx
+STM32_CHIP := STM32H750XBHX
+# can be the same as STM32_PART, but does not have to be.
+# See $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Source/Templates/gcc/
+STM32_PART_LC := stm32h750xx
+STM32_BOARD := STM32H750B-DK
+ARM_DEF := CM7
+ARM_MATH_DEF := ARM_MATH_CM7
+HSE_VALUE := 16000000
+CPU := -mcpu=cortex-m7
+FPU := -mfpu=fpv5-d16
+FLOAT_ABI := -mfloat-abi=hard
+MCU := -mthumb $(CPU) $(FPU) $(FLOAT_ABI)
+
+# Platform-specific files supplied by your board/project. Loaded with defaults below.
+PLATFORM_C_SOURCES :=
+PLATFORM_CPP_SOURCES :=
+PLATFORM_ASM_SOURCES :=
+
+STARTUP_FILE ?= $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Source/Templates/gcc/startup_$(STM32_PART_LC).s
+LINKER_SCRIPT ?= $(STM32_FW_DIR)/Projects/$(STM32_BOARD)/Templates/ExtMem_Boot/STM32CubeIDE/$(STM32_CHIP)_FLASH.ld
+C_INCLUDES += -I$(STM32_FW_DIR)/Projects/$(STM32_BOARD)/Templates/ExtMem_Boot/Inc
+SYSTEM_FILE ?= $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Source/Templates/system_$(STM32_HAL_PREFIX).c
+
+PLATFORM_C_SOURCES += $(SYSTEM_FILE)
+PLATFORM_ASM_SOURCES += $(STARTUP_FILE)
+
+# =========================================================
+# INTERNAL CONFIG
+# =========================================================
+USE_FREERTOS := 1
+USE_STM32_HAL := 1
+USE_STM32_LL := 1
+
+CMSIS_CORE_DIR := $(STM32_FW_DIR)/Drivers/CMSIS/Core/Include
+CMSIS_DEVICE_DIR := $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Include
+STM32_HAL_DIR := $(STM32_FW_DIR)/Drivers/$(STM32_FAMILY)_HAL_Driver
+STM32_HAL_SRC_DIR := $(STM32_HAL_DIR)/Src
+STM32_HAL_INC_DIR := $(STM32_HAL_DIR)/Inc
+
+C_INCLUDES += \
+-I$(SRC_DIR) \
+-I$(CMSIS_CORE_DIR) \
+-I$(CMSIS_DEVICE_DIR) \
+-I$(STM32_HAL_INC_DIR) \
+-I$(STM32_HAL_INC_DIR)/Legacy \
+-I.
+
+C_DEFS += \
+-DCORE_$(ARM_DEF) \
+-D$(STM32_PART) \
+-D$(ARM_MATH_DEF) \
+-DHSE_VALUE=$(HSE_VALUE) \
+-DUSE_HAL_DRIVER
+
+ifeq ($(USE_STM32_LL),1)
+C_DEFS += -DUSE_FULL_LL_DRIVER
+endif
+
+# -------------------------
+# jescore paths
+# -------------------------
+LIBRARY_JSON := $(JESCORE_DIR)/library.json
+JESCORE_VERSION := $(shell sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' $(LIBRARY_JSON))
+C_DEFS += '-DJES_FW_VER="$(JESCORE_VERSION)"'
+JESCORE_LIB_DIRS := \
+$(JESCORE_DIR)/lib/core \
+$(JESCORE_DIR)/lib/base_jobs \
+$(JESCORE_DIR)/lib/cli \
+$(JESCORE_DIR)/lib/commands \
+$(JESCORE_DIR)/lib/jescore_api \
+$(JESCORE_DIR)/lib/job_driver \
+$(JESCORE_DIR)/lib/job_names \
+$(JESCORE_DIR)/lib/unified
+
+C_INCLUDES += \
+-I$(JESCORE_DIR)/include/FreeRTOSConfig \
+-I$(JESCORE_DIR)/include \
+-I$(JESCORE_DIR)/src \
+-I$(JESCORE_DIR)/lib/base_jobs \
+-I$(JESCORE_DIR)/lib/cli \
+-I$(JESCORE_DIR)/lib/commands \
+-I$(JESCORE_DIR)/lib/core \
+-I$(JESCORE_DIR)/lib/jes_err \
+-I$(JESCORE_DIR)/lib/jescore_api \
+-I$(JESCORE_DIR)/lib/job_driver \
+-I$(JESCORE_DIR)/lib/job_names \
+-I$(JESCORE_DIR)/lib/unified
+
+# -------------------------
+# FreeRTOS
+# -------------------------
+FREERTOS_DIR := $(JESCORE_DIR)/FreeRTOS-Kernel
+ifeq ($(USE_FREERTOS),1)
+FREERTOS_PORT_DIR ?= $(FREERTOS_DIR)/portable/GCC/ARM_$(ARM_DEF)/r0p1
+FREERTOS_MEMMANG_DIR := $(FREERTOS_DIR)/portable/MemMang
+
+C_INCLUDES += \
+-I$(FREERTOS_DIR)/include \
+-I$(FREERTOS_PORT_DIR)
+
+C_SOURCES += \
+$(FREERTOS_DIR)/tasks.c \
+$(FREERTOS_DIR)/queue.c \
+$(FREERTOS_DIR)/list.c \
+$(FREERTOS_DIR)/timers.c \
+$(FREERTOS_DIR)/event_groups.c \
+$(FREERTOS_DIR)/stream_buffer.c \
+$(FREERTOS_MEMMANG_DIR)/heap_4.c \
+$(wildcard $(FREERTOS_PORT_DIR)/*.c)
+endif
+
+# -------------------------
+# jescore sources
+# -------------------------
+C_SOURCES += $(foreach dir,$(JESCORE_LIB_DIRS),$(wildcard $(dir)/*.c))
+CPP_SOURCES += $(foreach dir,$(JESCORE_LIB_DIRS),$(wildcard $(dir)/*.cpp))
+
+# -------------------------
+# Platform + STM32 sources
+# -------------------------
+STM32_HAL_C_SOURCES :=
+
+STM32_HAL_EXCLUDE_PATTERNS := \
+%_template.c \
+%_timebase_%.c
+
+ifeq ($(USE_STM32_HAL),1)
+STM32_HAL_C_SOURCES += \
+$(filter-out $(STM32_HAL_EXCLUDE_PATTERNS), \
+$(wildcard $(STM32_HAL_SRC_DIR)/$(STM32_HAL_PREFIX)_hal*.c))
+endif
+
+ifeq ($(USE_STM32_LL),1)
+STM32_HAL_C_SOURCES += \
+$(wildcard $(STM32_HAL_SRC_DIR)/$(STM32_HAL_PREFIX)_ll*.c)
+endif
+
+C_SOURCES += $(PLATFORM_C_SOURCES)
+C_SOURCES += $(STM32_HAL_C_SOURCES)
+CPP_SOURCES += $(PLATFORM_CPP_SOURCES)
+ASM_SOURCES += $(PLATFORM_ASM_SOURCES)
+
+# -------------------------
+# Toolchain
+# -------------------------
+PREFIX := arm-none-eabi-
+ifdef GCC_PATH
+TOOLCHAIN := $(GCC_PATH)/$(PREFIX)
+else
+TOOLCHAIN := $(PREFIX)
+endif
+
+CC := $(TOOLCHAIN)gcc
+CXX := $(TOOLCHAIN)g++
+AS := $(TOOLCHAIN)gcc -x assembler-with-cpp
+CP := $(TOOLCHAIN)objcopy
+SZ := $(TOOLCHAIN)size
+GDB := $(TOOLCHAIN)gdb
+HEX := $(CP) -O ihex
+BIN := $(CP) -O binary -S
+
+# -------------------------
+# Flags
+# -------------------------
+DEBUG ?= 0
+OPT ?= -Og
+WARNINGS := -Wall -Wno-attributes -Wno-strict-aliasing -Wno-maybe-uninitialized -Wno-missing-attributes -Wno-stringop-overflow
+CPP_WARNINGS := -Wno-register
+
+AS_DEFS :=
+AS_INCLUDES :=
+
+ASFLAGS := $(MCU) $(AS_INCLUDES) $(AS_DEFS) -ggdb $(WARNINGS) $(OPT) -fdata-sections -ffunction-sections
+CFLAGS := $(MCU) $(C_INCLUDES) $(C_DEFS) -ggdb $(WARNINGS) $(OPT) -fasm -fdata-sections -ffunction-sections -ffreestanding
+CPPFLAGS := $(CFLAGS) $(CPP_WARNINGS) -fno-exceptions -fno-rtti
+
+ifeq ($(DEBUG),1)
+CFLAGS += -g -DDEBUG=1
+CPPFLAGS += -g -DDEBUG=1
+else
+CFLAGS += -DNDEBUG=1 -DRELEASE=1
+CPPFLAGS += -DNDEBUG=1 -DRELEASE=1
+endif
+
+C_STANDARD := -std=gnu11
+CPP_STANDARD := -std=gnu++14
+
+# Link flags for firmware image.
+# nano.specs keeps libc small. nosys.specs provides weak syscall stubs.
+BUILD_DIR := build
+MAP_FILE := $(BUILD_DIR)/$(TARGET).map
+LDFLAGS := $(MCU) \
+-T$(LINKER_SCRIPT) \
+-Wl,-Map=$(MAP_FILE) \
+-Wl,--gc-sections \
+-Wl,--print-memory-usage \
+-static \
+--specs=nano.specs \
+--specs=nosys.specs
+
+# =========================================================
+# Build rules
+# =========================================================
+
+ELF := $(BUILD_DIR)/$(TARGET).elf
+HEX_FILE := $(BUILD_DIR)/$(TARGET).hex
+BIN_FILE := $(BUILD_DIR)/$(TARGET).bin
+
+all: $(ELF) $(HEX_FILE) $(BIN_FILE)
+
+C_OBJECTS := $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
+CPP_OBJECTS := $(addprefix $(BUILD_DIR)/,$(notdir $(CPP_SOURCES:.cpp=.o)))
+
+ASM_S_SOURCES := $(filter %.s,$(ASM_SOURCES))
+ASM_CAP_S_SOURCES := $(filter %.S,$(ASM_SOURCES))
+
+ASM_OBJECTS := $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_S_SOURCES:.s=.o)))
+ASM_OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_CAP_S_SOURCES:.S=.o)))
+
+OBJECTS := $(C_OBJECTS) $(CPP_OBJECTS) $(ASM_OBJECTS)
+SORTED_OBJECTS := $(sort $(OBJECTS))
+
+vpath %.c $(sort $(dir $(C_SOURCES)))
+vpath %.cpp $(sort $(dir $(CPP_SOURCES)))
+vpath %.s $(sort $(dir $(ASM_SOURCES)))
+vpath %.S $(sort $(dir $(ASM_SOURCES)))
+
+$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(C_STANDARD) -c $< -o $@ -MD -MP -MF $(@:.o=.dep)
+
+$(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR)
+	mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CPP_STANDARD) -c $< -o $@ -MD -MP -MF $(@:.o=.dep)
+
+$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
+	mkdir -p $(@D)
+	$(AS) $(ASFLAGS) -c $< -o $@ -MD -MP -MF $(@:.o=.dep)
+
+$(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR)
+	mkdir -p $(@D)
+	$(AS) $(ASFLAGS) -c $< -o $@ -MD -MP -MF $(@:.o=.dep)
+
+$(BUILD_DIR)/$(TARGET).elf: $(SORTED_OBJECTS) Makefile
+	$(CXX) $(SORTED_OBJECTS) $(LDFLAGS) -o $@
+	$(SZ) $@
+
+$(HEX_FILE): $(ELF)
+	$(HEX) $< $@
+
+$(BIN_FILE): $(ELF)
+	$(BIN) $< $@
+
+$(BUILD_DIR):
+	mkdir -p $@
+
+clean:
+	-rm -fR $(BUILD_DIR)
+
+print-config:
+	@echo TARGET=$(TARGET)
+	@echo STM32_FW_DIR=$(STM32_FW_DIR)
+	@echo STM32_FAMILY=$(STM32_FAMILY)
+	@echo STM32_PART=$(STM32_PART)
+	@echo STM32_PART_LC=$(STM32_PART_LC)
+	@echo STM32_HAL_PREFIX=$(STM32_HAL_PREFIX)
+	@echo STM32_BOARD=$(STM32_BOARD)
+	@echo STARTUP_FILE=$(STARTUP_FILE)
+	@echo SYSTEM_FILE=$(SYSTEM_FILE)
+	@echo LINKER_SCRIPT=$(LINKER_SCRIPT)
+	@echo MCU=$(MCU)
+	@echo USE_FREERTOS=$(USE_FREERTOS)
+	@echo USE_STM32_HAL=$(USE_STM32_HAL)
+	@echo USE_STM32_LL=$(USE_STM32_LL)
+	@echo JESCORE_DIR=$(JESCORE_DIR)
+	@echo FREERTOS_DIR=$(FREERTOS_DIR)
+	@echo FREERTOS_PORT_DIR=$(FREERTOS_PORT_DIR)
+
+DEPS := $(SORTED_OBJECTS:.o=.dep)
+-include $(DEPS)
+
+.PHONY: all clean print-config program reset
+
+# =========================================================
+# Flashing
+# =========================================================
+
+OPENOCD ?= openocd
+OPENOCD_STM32_TARGET ?= $(patsubst %xx,%x,$(STM32_HAL_PREFIX))
+OPENOCD_INTERFACE ?= interface/stlink.cfg
+OPENOCD_TARGET ?= target/$(OPENOCD_STM32_TARGET).cfg
+
+program: $(ELF)
+	$(OPENOCD) \
+	-f $(OPENOCD_INTERFACE) \
+	-f $(OPENOCD_TARGET) \
+	-c "program $(ELF) verify reset exit"
+
+reset:
+	$(OPENOCD) \
+	-f $(OPENOCD_INTERFACE) \
+	-f $(OPENOCD_TARGET) \
+	-c "reset run; exit"
