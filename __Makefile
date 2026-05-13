@@ -1,0 +1,104 @@
+# =========================================================
+# USER CONFIG (EDIT ONLY THIS BLOCK)
+# =========================================================
+
+TARGET = jescore_pioless
+
+SRC_DIR := src
+
+LIBDAISY_DIR := ../libDaisy
+JESCORE_DIR  := ../jescore
+
+USE_FREERTOS := 1
+
+C_DEFS += '-DJES_FW_VER="2.3.0"'
+
+C_SOURCES   := 
+CPP_SOURCES := src/hello_world_daisy_seed.cpp
+C_INCLUDES :=
+
+# =========================================================
+# INTERNAL CONFIG (DO NOT EDIT BELOW)
+# =========================================================
+
+FREERTOS_DIR := $(JESCORE_DIR)/FreeRTOS-Kernel
+
+# -------------------------
+# VPATH (auto-generated)
+# -------------------------
+VPATH += $(SRC_DIR)
+
+ifeq ($(USE_FREERTOS),1)
+VPATH += $(FREERTOS_DIR)
+VPATH += $(FREERTOS_DIR)/portable/GCC/ARM_CM7/r0p1
+VPATH += $(FREERTOS_DIR)/portable/MemMang
+endif
+
+VPATH += $(JESCORE_DIR)/lib/core
+VPATH += $(JESCORE_DIR)/lib/base_jobs
+VPATH += $(JESCORE_DIR)/lib/cli
+VPATH += $(JESCORE_DIR)/lib/commands
+VPATH += $(JESCORE_DIR)/lib/jescore_api
+VPATH += $(JESCORE_DIR)/lib/job_driver
+VPATH += $(JESCORE_DIR)/lib/job_names
+VPATH += $(JESCORE_DIR)/lib/unified
+
+# -------------------------
+# Includes
+# -------------------------
+ifeq ($(USE_FREERTOS),1)
+C_INCLUDES += \
+-I$(FREERTOS_DIR)/include \
+-I$(FREERTOS_DIR)/portable/GCC/ARM_CM7/r0p1
+endif
+
+C_INCLUDES += \
+-I$(JESCORE_DIR)/include/FreeRTOSConfig \
+-I$(JESCORE_DIR)/include \
+-I$(JESCORE_DIR)/src \
+-I$(JESCORE_DIR)/lib/base_jobs \
+-I$(JESCORE_DIR)/lib/cli \
+-I$(JESCORE_DIR)/lib/commands \
+-I$(JESCORE_DIR)/lib/core \
+-I$(JESCORE_DIR)/lib/jes_err \
+-I$(JESCORE_DIR)/lib/jescore_api \
+-I$(JESCORE_DIR)/lib/job_driver \
+-I$(JESCORE_DIR)/lib/job_names \
+-I$(JESCORE_DIR)/lib/unified
+
+# -------------------------
+# Sources
+# -------------------------
+
+# FreeRTOS
+ifeq ($(USE_FREERTOS),1)
+C_SOURCES += \
+tasks.c \
+queue.c \
+list.c \
+timers.c \
+event_groups.c \
+stream_buffer.c \
+heap_4.c
+
+C_SOURCES += $(notdir $(wildcard $(FREERTOS_DIR)/portable/GCC/ARM_CM7/r0p1/*.c))
+endif
+
+# JesCore
+C_SOURCES += $(notdir $(wildcard $(JESCORE_DIR)/lib/core/*.c))
+C_SOURCES += $(notdir $(wildcard $(JESCORE_DIR)/lib/base_jobs/*.c))
+C_SOURCES += $(notdir $(wildcard $(JESCORE_DIR)/lib/cli/*.c))
+C_SOURCES += $(notdir $(wildcard $(JESCORE_DIR)/lib/jescore_api/*.c))
+C_SOURCES += $(notdir $(wildcard $(JESCORE_DIR)/lib/job_driver/*.c))
+C_SOURCES += $(notdir $(wildcard $(JESCORE_DIR)/lib/unified/*.c))
+
+# -------------------------
+# libDaisy core
+# -------------------------
+SYSTEM_FILES_DIR := $(LIBDAISY_DIR)/core
+include $(SYSTEM_FILES_DIR)/Makefile
+
+# -------------------------
+# Debug
+# -------------------------
+OPT = -Og

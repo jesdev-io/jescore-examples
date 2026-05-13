@@ -1,0 +1,39 @@
+# =========================================================
+# USER CONFIG (EDIT ONLY THIS BLOCK)
+# =========================================================
+
+TARGET = daisy_test
+
+SRC_DIR := src
+
+LIBDAISY_DIR := ../libDaisy
+
+CPP_SOURCES := hello_world_daisy_seed.cpp
+
+# optional defines
+C_DEFS +=
+
+# =========================================================
+# INTERNAL CONFIG (DO NOT EDIT BELOW)
+# =========================================================
+
+# search path for your source file
+VPATH += $(SRC_DIR)
+
+# includes (minimal)
+C_INCLUDES += \
+-I$(LIBDAISY_DIR) \
+-I$(LIBDAISY_DIR)/src \
+-I$(LIBDAISY_DIR)/src/sys \
+-I$(LIBDAISY_DIR)/src/per \
+-I$(LIBDAISY_DIR)/Drivers/CMSIS_5/CMSIS/Core/Include \
+-I$(LIBDAISY_DIR)/Drivers/CMSIS-DSP/Include \
+-I$(LIBDAISY_DIR)/Drivers/CMSIS-Device/ST/STM32H7xx/Include \
+-I$(LIBDAISY_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc
+
+# include libDaisy build system
+SYSTEM_FILES_DIR := $(LIBDAISY_DIR)/core
+include $(SYSTEM_FILES_DIR)/Makefile
+
+# debug optimization
+OPT = -Og
