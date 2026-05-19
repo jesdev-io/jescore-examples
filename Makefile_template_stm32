@@ -18,21 +18,25 @@ CPP_SOURCES :=
 ASM_SOURCES :=
 C_INCLUDES :=
 
-# jescore repo location (contains FreeRTOS-Kernel as submodule)
+# jescore repo location
 JESCORE_DIR := ../jescore
+
+# FreeRTOS-Kernel location (set this to your local FreeRTOS-Kernel path)
+FREERTOS_DIR := ../FreeRTOS-Kernel
 
 # Your project macros 
 C_DEFS := \
 	-DSTM32H7
 
 # STM32 family/part selection. Adjust these for your target.
+# Set this to your STM32CubeFW directory (e.g., STM32CubeH7, STM32CubeL4, etc.)
 STM32_FW_DIR := ../STM32CubeH7
 STM32_FAMILY := STM32H7xx
 STM32_HAL_PREFIX := stm32h7xx
 STM32_PART := STM32H750xx
 STM32_CHIP := STM32H750XBHX
 # can be the same as STM32_PART, but does not have to be.
-# See $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Source/Templates/gcc/
+# See $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Source/Templates/gcc/
 STM32_PART_LC := stm32h750xx
 STM32_BOARD := STM32H750B-DK
 ARM_DEF := CM7
@@ -49,7 +53,7 @@ PLATFORM_CPP_SOURCES :=
 PLATFORM_ASM_SOURCES :=
 
 STARTUP_FILE ?= $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Source/Templates/gcc/startup_$(STM32_PART_LC).s
-LINKER_SCRIPT ?= $(STM32_FW_DIR)/Projects/$(STM32_BOARD)/Templates/ExtMem_Boot/STM32CubeIDE/$(STM32_CHIP)_FLASH.ld
+LINKER_SCRIPT ?= $(STM32_FW_DIR)/Projects/STM32H743I-EVAL/Examples/HASH/HASH_SHA1MD5/STM32CubeIDE/STM32H753XIHX_FLASH.ld
 C_INCLUDES += -I$(STM32_FW_DIR)/Projects/$(STM32_BOARD)/Templates/ExtMem_Boot/Inc
 SYSTEM_FILE ?= $(STM32_FW_DIR)/Drivers/CMSIS/Device/ST/$(STM32_FAMILY)/Source/Templates/system_$(STM32_HAL_PREFIX).c
 
@@ -121,7 +125,6 @@ C_INCLUDES += \
 # -------------------------
 # FreeRTOS
 # -------------------------
-FREERTOS_DIR := $(JESCORE_DIR)/FreeRTOS-Kernel
 ifeq ($(USE_FREERTOS),1)
 FREERTOS_PORT_DIR ?= $(FREERTOS_DIR)/portable/GCC/ARM_$(ARM_DEF)/r0p1
 FREERTOS_MEMMANG_DIR := $(FREERTOS_DIR)/portable/MemMang
@@ -290,8 +293,12 @@ clean:
 	-rm -fR $(BUILD_DIR)
 
 print-config:
-	@echo TARGET=$(TARGET)
-	@echo STM32_FW_DIR=$(STM32_FW_DIR)
+	@echo "=== jescore STM32 Makefile Configuration ==="
+	@echo "TARGET: $(TARGET)"
+	@echo "STM32_FW_DIR: $(STM32_FW_DIR)"
+	@test -d "$(STM32_FW_DIR)" || echo "WARNING: STM32_FW_DIR does not exist. Set STM32_FW_DIR to your STM32CubeFW path."
+	@echo "FREERTOS_DIR: $(FREERTOS_DIR)"
+	@test -d "$(FREERTOS_DIR)" || echo "WARNING: FREERTOS_DIR does not exist. Set FREERTOS_DIR to your FreeRTOS-Kernel path."
 	@echo STM32_FAMILY=$(STM32_FAMILY)
 	@echo STM32_PART=$(STM32_PART)
 	@echo STM32_PART_LC=$(STM32_PART_LC)
