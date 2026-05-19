@@ -127,7 +127,7 @@ void audio_controller(void* p) {
     while(arg != NULL) {
         if(jes_job_is_arg(arg, "spl")) {
             volatile stereo_val_t val = *(stereo_val_t*)jes_wait_for_notification();
-            uart_unif_writef("Monitoring %d channels (%d buffer average)\n\r", NUM_CHANNELS, ROLLING_WINDOW_SIZE);
+            jes_print("Monitoring %d channels (%d buffer average)\n\r", NUM_CHANNELS, ROLLING_WINDOW_SIZE);
             for(uint8_t i = 0; i < NUM_CHANNELS; i++){
                 formatFloat(val.channels[i], 2, fmt);
                 bar_lens[i] = (int16_t)((val.channels[i] - min_SPL) / (max_SPL - min_SPL) * max_bar_length);
@@ -142,11 +142,11 @@ void audio_controller(void* p) {
                     }
                 }
                 strcat(buf, "]\n\r");
-                uart_unif_write(buf);
+                jes_print(buf);
             }
         }
         else {
-            uart_unif_writef("Unknown arg <%s>\n\r", arg);
+            jes_print("Unknown arg <%s>\n\r", arg);
         }
         arg = jes_job_arg_next();
     }

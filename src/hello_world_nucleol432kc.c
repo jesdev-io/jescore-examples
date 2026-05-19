@@ -19,7 +19,7 @@ void blink(void* p){
 }
 
 void hello(void* p){
-    uart_unif_writef("Hello World!\n\r");
+    jes_print("Hello World!\n\r");
 }
 
 int main(void){
