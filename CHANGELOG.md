@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-05-20
+
+### Added
+- 👋 Hello World examples for STM32G431KB and STM32H753
+- 📁 Makefile template for STM32H750 (works for all STM32 boards if adjust)
+
+### Changed
+- 🖨️ Updated all examples to use `jes_print()`
+- 📁 Updated Makefile template to reflect new changes
+- 🔆 Unfix `jescore` version
+- 🖨️ Switch to `jes_print()`
+
+### Fixed
+- 📁 Ignore local builds in git (result of Makefile support)
+
 ## 2026-04-21
 
 ### Added
