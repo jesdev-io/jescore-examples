@@ -7,7 +7,7 @@ void blink(void* p){
     static uint8_t act = 0;
     act = !act;
     while(act){
-        uart_unif_write("Blinking!\n\r");
+        jes_print("Blinking!\n\r");
         digitalWrite(LED_PIN, HIGH);
         jes_delay_job_ms(1000);
         digitalWrite(LED_PIN, LOW);
@@ -16,7 +16,7 @@ void blink(void* p){
 }
 
 void hello(void* p){
-    uart_unif_write("Hello World!\n\r");
+    jes_print("Hello World!\n\r");
 }
 
 void setup(){
