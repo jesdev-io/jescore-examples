@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-07-30
+
+### Added
+- 👋 Additional Hello World examples for STM32L476RG, STM32G431KB, STM32H750 and STM32H753
+- 📤 Multi UART streamer example
+- 📁 STM32H750 Makefile template
+
+### Changed
+- 🖨️ Updated examples and templates for the current `jes_print()` API
+- 🔆 Use the current `jescore` dependency instead of pinning an old version
+- 📚 Completed the README example list for the release
+
+### Fixed
+- 📁 Ignore local build outputs
+
 ## 2026-05-20
 
 ### Added
