@@ -23,6 +23,11 @@ If examples require more low level driver code, for example due to the inclusion
 |-|-|-|
 |👋 `hello_world_arduino`||ESP32 + Arduino|
 |👋 `hello_world_nucleol432kc`||STM32 NUCLEOL432KC|
+|👋 `hello_world_nucleol476rg`||STM32 NUCLEOL476RG|
+|👋 `hello_world_nucleo_g431kb`||STM32 NUCLEOG431KB|
+|👋 `hello_world_stm32h750`||STM32H750B-DK|
+|👋 `hello_world_stm32h753`||STM32H753I-EVAL|
 |🧮 `fsm_cli_arduino`||ESP32 + Arduino|
 |⏳️ `sync_async_arduino`||ESP32 + Arduino|
+|📤 `multi_uart_streamer_arduino`||ESP32 + Arduino|
 |🎤 `stereo_spl_meter_nucleol432kc`|[I²S](lib/port_stereo_spl_meter_nucleol432kc/)|STM32 NUCLEOL432KC|
